@@ -9,14 +9,16 @@ public class Unit : MonoBehaviour
     [SerializeField] protected float combatRadius = 2.5f;
     [SerializeField] protected float launchSpeed = 50f;
     [SerializeField] public int teamIndex = 0;
-    [SerializeField] protected float attackDamageBase = 50f;
+    [SerializeField] public float attackDamageBase = 50f;
 
     //Current States
-    protected float launchPower = 0; //Range: 0 - 1
+    protected float launchPower = 1f; //Range: 0 - 1
+    public float nextAttackAllieBoosted = 0f; //Can increase indefinitely
+    protected float currentAttackAllieBoosted = 0f;
 
     //Vitality
-    [SerializeField] protected Status health;
-    [SerializeField] protected Status stamina;
+    [SerializeField] public Status health;
+    [SerializeField] public Status stamina;
 
     //State Handling
     public enum UnitState { idle, attacking, stunned };
@@ -37,7 +39,7 @@ public class Unit : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) Launch();
+
     }
 
     private void UnitSetup()
@@ -51,6 +53,8 @@ public class Unit : MonoBehaviour
         StartStatusTicker();
     }
 
+    #region Attack Handling
+
     //Handling collisions
     private void OnCollisionEnter(Collision collision)
     {
@@ -60,37 +64,78 @@ public class Unit : MonoBehaviour
             Unit unitHit = collision.gameObject.GetComponent<Unit>();
             if(unitHit.teamIndex != teamIndex && combatState == UnitState.attacking)
             {
+                //Combat Code
                 CalculateCombatOutcome(unitHit);
+            }
+            else if(unitHit.teamIndex == teamIndex && combatState == UnitState.attacking)
+            {
+                //Allie Boost Code
+                unitHit.nextAttackAllieBoosted += launchPower + currentAttackAllieBoosted;
+                currentAttackAllieBoosted = 0f;
             }
         }
     }
 
     private void CalculateCombatOutcome(Unit enemyUnit)
     {
+        Debug.Log("Combat Initiated");
         switch (enemyUnit.combatState)
         {
             case (UnitState.attacking):
-                //When this unit lands an attack but the other unit is also attacking, do this
-                if(/*angles allign*/true)
+                //Check to make sure the enemy unit is within the attack angle
+                if(Vector3.Angle(transform.forward, enemyUnit.transform.position - transform.position) <= CombatController.combatController.combat.attackAngle)
                 {
-                    //Parry Code
-                }
-                else
-                {
-                    //Deal Damage Code
-                    enemyUnit.TakeDamage(attackDamageBase * attackDamageBase);
+                    Debug.Log("Enemy Unit within the attack radius of " + gameObject.name);
+                    //When this unit lands an attack but the other unit is also attacking, do this
+                    if (Vector3.Angle(enemyUnit.transform.forward, transform.position - enemyUnit.transform.position) <= CombatController.combatController.combat.attackAngle)
+                    {
+                        //Parry Code
+                        //Isolate one unit to play the parry effects, as both would if not specified
+                        if(enemyUnit.teamIndex > teamIndex)
+                        {
+                            Debug.Log(enemyUnit.gameObject.name + " and " + gameObject.name + " Parried");
+                        }
+                    }
+                    else
+                    {
+                        //Deal Damage Code
+                        Debug.Log("Attack landed on " + enemyUnit.gameObject.name + " despite them attack as well");
+                        DealAttack(enemyUnit);
+                    }
                 }
                 break;
+
             default:
                 //When this unit lands an attack, do this
+                //check if the enemy unit is in the attack radius
+                Debug.Log("Attack landed on " + enemyUnit.gameObject.name);
+                if (Vector3.Angle(transform.forward, enemyUnit.transform.position - transform.position) <= CombatController.combatController.combat.attackAngle)
+                {
+                    //Deal damage code
+                    DealAttack(enemyUnit);
+                }
                 break;
         }
     }
 
+    private void DealAttack(Unit enemyUnit)
+    {
+        enemyUnit.TakeDamage(attackDamageBase * (launchPower + currentAttackAllieBoosted) );
+        Debug.Log(enemyUnit.gameObject.name + " took damage");
+        currentAttackAllieBoosted = 0f;
+    }
+
+#endregion
+
     #region Launching and Aiming
 
-    public void Launch()
+    public void Launch(float _launchPower)
     {
+        //Reset power variables
+        launchPower = _launchPower;
+        currentAttackAllieBoosted = nextAttackAllieBoosted;
+        nextAttackAllieBoosted = 0f;
+
         //Start the coroutine that will handle the launch
         if (LaunchSequencer != null) StopCoroutine(LaunchSequencer);
         LaunchSequencer = LaunchSequence();
@@ -99,22 +144,29 @@ public class Unit : MonoBehaviour
 
     IEnumerator LaunchSequence()
     {
+        //Use Stamina
+        UseStamina(attackDamageBase * launchPower);
+
         //Set State
         combatState = UnitState.attacking;
 
-        //Add initial velocity
-        rigidbody.velocity += transform.forward * launchSpeed;
+        //Add initial velocity and make sure the unit can travel further than their max stamina allows if boosted by an allie
+        float launchVelocityMultiplier = Mathf.Clamp(launchPower + currentAttackAllieBoosted, 0f, 1f);
+        rigidbody.velocity += transform.forward * launchSpeed * launchVelocityMultiplier;
 
         //Dampen over time (using drag in RB)
         while (rigidbody.velocity.magnitude > 0.2f)
         {
             yield return null;
         }
-        //Clear all residual velocity
+        //Clear all residual velocity and reset launch power
         rigidbody.velocity = Vector3.zero;
+        launchPower = 0f;
+        currentAttackAllieBoosted = 0f;
 
         //Unset State
         combatState = UnitState.idle;
+
     }
 
     public void AimToward(Vector3 target)
@@ -143,8 +195,6 @@ public class Unit : MonoBehaviour
 
     IEnumerator TickVitality(List<Status> vitalities)
     {
-        float tick = 0f;
-
         while (true)
         {
             foreach (Status vitality in vitalities)
@@ -165,22 +215,40 @@ public class Unit : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        health.currentValue = Mathf.Clamp(health.currentValue + damage, health.minValue, health.maxValue);
+        health.currentValue = Mathf.Clamp(health.currentValue - damage, health.minValue, health.maxValue);
+        if (health.currentValue == 0f) Die();
     }
 
     public void UseStamina(float amount)
     {
-        stamina.currentValue = Mathf.Clamp(stamina.currentValue + amount, stamina.minValue, stamina.maxValue);
+        stamina.currentValue = Mathf.Clamp(stamina.currentValue - amount, stamina.minValue, stamina.maxValue);
     }
 
     public void SetHealth(float value)
     {
         health.currentValue = Mathf.Clamp(health.currentValue, health.minValue, health.maxValue);
+        if (health.currentValue == 0f) Die();
     }
 
     public void SetStamina(float value)
     {
         stamina.currentValue = Mathf.Clamp(stamina.currentValue, stamina.minValue, stamina.maxValue);
+    }
+
+    private void Die()
+    {
+        GameController.gameController.RemoveUnit(this.gameObject);
+        StopAllCoroutines();
+        StartCoroutine(DeathSequence());
+    }
+
+    IEnumerator DeathSequence()
+    {
+        //Add all death processes here
+
+        Destroy(gameObject);
+
+        yield return null;
     }
 
     #endregion

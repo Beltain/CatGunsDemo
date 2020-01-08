@@ -34,7 +34,7 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        GetTouchInput();
+        if(GameController.gameNavicable)GetTouchInput();
     }
 
     private void GetTouchInput()

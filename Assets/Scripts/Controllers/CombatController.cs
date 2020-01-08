@@ -6,14 +6,19 @@ public class CombatController : MonoBehaviour
 {
     //Profiles
     public CombatProfile_SO combat;
+    public static CombatController combatController;
 
     //Sequencers
     IEnumerator AimSequencer;
 
+    private void Awake()
+    {
+        combatController = this;
+    }
 
     private void Update()
     {
-        CheckUnitSelectInput();
+        if(GameController.gamePlayable)CheckUnitSelectInput();
     }
 
     void CheckUnitSelectInput()
@@ -41,15 +46,29 @@ public class CombatController : MonoBehaviour
 
     IEnumerator AimSequence(Unit unit)
     {
+        float launchPower = 0f;
+
         //While they're holding
         while (Input.GetMouseButton(0) && Input.touchCount == 1)
         {
+            //Get the potential power of the launch of the player released the aim at this moment
+            launchPower = GetLaunchPower(unit);
+            Debug.Log("Current launch power is " + launchPower);
+
             //Face unit toward opposite of mouse position in world
             unit.AimToward((-(getMousePointInWorld() - unit.transform.position))*100f);
             yield return null;
         }
         //and Launch
-        unit.Launch();
+        unit.Launch(launchPower);
+    }
+
+    public float GetLaunchPower(Unit unit)
+    {
+        //what was drawn
+        float pwr = Mathf.Clamp(Vector3.Distance(getMousePointInWorld(), unit.transform.position) / combat.maxPowerRange, 0f, 1f);
+        //What it can be with the selected unit's stamina
+        return Mathf.Clamp(pwr, 0f, unit.stamina.currentValue / (unit.attackDamageBase * pwr));
     }
 
     private Vector3 getMousePointInWorld()
@@ -57,7 +76,7 @@ public class CombatController : MonoBehaviour
         Vector3 mousePos = Input.mousePosition;
         mousePos.z = 1.0f;
         Ray cameraRay = Camera.main.ScreenPointToRay(mousePos);
-        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+        Plane groundPlane = new Plane(Vector3.up, GameController.gameController.level.levelYOffset);
         float rayLength;
         if (groundPlane.Raycast(cameraRay, out rayLength))
         {
