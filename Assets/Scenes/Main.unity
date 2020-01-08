@@ -412,6 +412,8 @@ MonoBehaviour:
   arenaBounds: {fileID: 0}
   level: {fileID: 11400000, guid: 240eb5126685c3640ac3d44c33eea9f5, type: 2}
   activeUnits: []
+  allyPowerUps: []
+  enemyPowerUps: []
 --- !u!4 &1369653506
 Transform:
   m_ObjectHideFlags: 0
