@@ -9,6 +9,10 @@ public class Unit : MonoBehaviour
     [SerializeField] protected float combatRadius = 2.5f;
     [SerializeField] protected float launchSpeed = 50f;
     [SerializeField] public int teamIndex = 0;
+    [SerializeField] protected float attackDamageBase = 50f;
+
+    //Current States
+    protected float launchPower = 0; //Range: 0 - 1
 
     //Vitality
     [SerializeField] protected Status health;
@@ -67,7 +71,15 @@ public class Unit : MonoBehaviour
         {
             case (UnitState.attacking):
                 //When this unit lands an attack but the other unit is also attacking, do this
-
+                if(/*angles allign*/true)
+                {
+                    //Parry Code
+                }
+                else
+                {
+                    //Deal Damage Code
+                    enemyUnit.TakeDamage(attackDamageBase * attackDamageBase);
+                }
                 break;
             default:
                 //When this unit lands an attack, do this
