@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5684a4a092fc5904f9d449075db1f21a, type: 3}
   m_Name: Default
   m_EditorClassIdentifier: 
-  arenaRadius: 20
+  arenaRadius: 30
   enemyQuantity: {x: 4, y: 5}
   allyQuantity: {x: 3, y: 4}
   powerUpQuantity: {x: 2, y: 6}

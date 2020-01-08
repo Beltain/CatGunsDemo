@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour
     [SerializeField] protected Transform arenaBounds;
     [SerializeField] public LevelProfile_SO level;
     [SerializeField] protected List<GameObject> activeUnits = new List<GameObject>();
+    [SerializeField] protected List<GameObject> activeWorldPowerUps = new List<GameObject>();
     [SerializeField] protected List<GameObject> allyPowerUps = new List<GameObject>();
     [SerializeField] protected List<GameObject> enemyPowerUps = new List<GameObject>();
 
@@ -131,7 +132,7 @@ public class GameController : MonoBehaviour
                 if (!intersects)
                 {
                     spawned = true;
-                    Instantiate(powerUp, spawnPoint, Quaternion.identity);
+                    activeWorldPowerUps.Add(Instantiate(powerUp, spawnPoint, Quaternion.identity));
                 }
             }
         }
@@ -151,6 +152,11 @@ public class GameController : MonoBehaviour
             //If it was, run the elimination process for that team
             TeamElimination(removedUnitsTeam);
         }
+    }
+
+    public void RemoveWorldPowerUp(GameObject powerup)
+    {
+        activeWorldPowerUps.Remove(powerup);
     }
 
     private int GetTeamUnitCountInActiveUnits(int teamIndex)
@@ -194,6 +200,25 @@ public class GameController : MonoBehaviour
 
         //End Game
         gamePlayable = false;
+    }
+
+    public void RefreshGameLevel()
+    {
+        gamePlayable = true;
+        gameNavicable = true;
+        foreach(GameObject unit in activeUnits)
+        {
+            Destroy(unit);
+        }
+        activeUnits = new List<GameObject>();
+        foreach(GameObject powerup in activeWorldPowerUps)
+        {
+            Destroy(powerup);
+        }
+        activeWorldPowerUps = new List<GameObject>();
+        allyPowerUps = new List<GameObject>();
+        enemyPowerUps = new List<GameObject>();
+        SpawnUnitsInLevel();
     }
 
     #endregion

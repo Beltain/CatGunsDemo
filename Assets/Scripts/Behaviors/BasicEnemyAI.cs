@@ -71,6 +71,10 @@ public class BasicEnemyAI : MonoBehaviour
                 }
 
             }
+            else
+            {
+                break;
+            }
         }
     }
 
