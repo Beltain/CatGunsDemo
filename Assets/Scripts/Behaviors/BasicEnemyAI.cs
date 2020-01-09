@@ -71,10 +71,7 @@ public class BasicEnemyAI : MonoBehaviour
                 }
 
             }
-            else
-            {
-                break;
-            }
+            else break;
         }
     }
 
@@ -163,7 +160,7 @@ public class BasicEnemyAI : MonoBehaviour
         while (drawTime > 0f)
         {
             //DO THIS BEFORE LAUNCHING
-            Debug.Log("Launching in " + drawTime + " seconds");
+            //Debug.Log("Launching in " + drawTime + " seconds");
             drawTime -= Time.deltaTime;
             yield return null;
         }

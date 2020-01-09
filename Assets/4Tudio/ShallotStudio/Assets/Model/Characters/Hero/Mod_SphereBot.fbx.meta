@@ -1,0 +1,134 @@
+fileFormatVersion: 2
+guid: 3a8cd6a79485845d98af491f4a45b599
+timeCreated: 1489545286
+licenseType: Store
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Body
+    100002: Cap
+    100004: Center
+    100006: Gun_01
+    100008: Gun_01_Root
+    100010: Gun_02
+    100012: Gun_02_Root
+    100014: Gun_03
+    100016: Gun_03_Root
+    100018: Gun_04
+    100020: Gun_04_Root
+    100022: Laser_01_End
+    100024: Laser_01_Mid
+    100026: Laser_01_Root
+    100028: Laser_02_End
+    100030: Laser_02_Mid
+    100032: Laser_02_Root
+    100034: Laser_03_End
+    100036: Laser_03_Mid
+    100038: Laser_03_Root
+    100040: Laser_04_End
+    100042: Laser_04_Mid
+    100044: Laser_04_Root
+    100046: //RootNode
+    100048: Root
+    100050: ShpereBot_Body
+    100052: ShpereBot_FXs
+    100054: SkeletonMesh_ShpereBot
+    100056: Wall
+    400000: Body
+    400002: Cap
+    400004: Center
+    400006: Gun_01
+    400008: Gun_01_Root
+    400010: Gun_02
+    400012: Gun_02_Root
+    400014: Gun_03
+    400016: Gun_03_Root
+    400018: Gun_04
+    400020: Gun_04_Root
+    400022: Laser_01_End
+    400024: Laser_01_Mid
+    400026: Laser_01_Root
+    400028: Laser_02_End
+    400030: Laser_02_Mid
+    400032: Laser_02_Root
+    400034: Laser_03_End
+    400036: Laser_03_Mid
+    400038: Laser_03_Root
+    400040: Laser_04_End
+    400042: Laser_04_Mid
+    400044: Laser_04_Root
+    400046: //RootNode
+    400048: Root
+    400050: ShpereBot_Body
+    400052: ShpereBot_FXs
+    400054: SkeletonMesh_ShpereBot
+    400056: Wall
+    4300000: ShpereBot_Body
+    4300002: ShpereBot_FXs
+    9500000: //RootNode
+    13700000: ShpereBot_Body
+    13700002: ShpereBot_FXs
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 100
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

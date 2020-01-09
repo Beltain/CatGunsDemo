@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5684a4a092fc5904f9d449075db1f21a, type: 3}
   m_Name: Default
   m_EditorClassIdentifier: 
-  arenaRadius: 30
+  arenaRadius: 20
   enemyQuantity: {x: 4, y: 5}
   allyQuantity: {x: 3, y: 4}
   powerUpQuantity: {x: 2, y: 6}
@@ -21,6 +21,9 @@ MonoBehaviour:
   enemiesPool:
   - {fileID: 3751758593795256132, guid: 8183489df993ab74bb716ce8a2328b73, type: 3}
   powerUpsPool:
-  - {fileID: 1378100754559558642, guid: 1847c6ad9b610a34f94f795871fb74b0, type: 3}
+  - {fileID: 7461471981589343595, guid: e8cc157a96f71a3428529df2ed2e8f8f, type: 3}
+  - {fileID: 7069658175201313451, guid: b5f6bfc71ae6283419fa198b721fbe90, type: 3}
+  - {fileID: 2278548619725974922, guid: b7ef7085025493543b4962b3baf2a466, type: 3}
+  - {fileID: 5271292844892926238, guid: 6e6f9f5227068374e96431415f9a44d4, type: 3}
   spawnSpacingMinimum: 3
   levelYOffset: 0.5

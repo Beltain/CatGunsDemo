@@ -14,4 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTeamIndex: 0
   attackAngle: 75
-  maxPowerRange: 12
+  maxPowerRange: 18
+  alliedPowerBoostLimit: 5
+  gameSpeedMultiplier: 1
+  secondsBeforeStart: 2
+  attackChoreographyTime: 1
+  unitSelectionRadius: 4

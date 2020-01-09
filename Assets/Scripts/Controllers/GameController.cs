@@ -7,12 +7,13 @@ public class GameController : MonoBehaviour
     [SerializeField] public static GameController gameController;
     [SerializeField] public static bool gameNavicable;
     [SerializeField] public static bool gamePlayable;
+    [SerializeField] public static bool unitsSelectable;
     [SerializeField] protected Transform arenaBounds;
     [SerializeField] public LevelProfile_SO level;
-    [SerializeField] protected List<GameObject> activeUnits = new List<GameObject>();
+    [SerializeField] public List<GameObject> activeUnits = new List<GameObject>();
     [SerializeField] protected List<GameObject> activeWorldPowerUps = new List<GameObject>();
-    [SerializeField] protected List<GameObject> allyPowerUps = new List<GameObject>();
-    [SerializeField] protected List<GameObject> enemyPowerUps = new List<GameObject>();
+    [SerializeField] public List<GameObject> allyPowerUps = new List<GameObject>();
+    [SerializeField] public List<GameObject> enemyPowerUps = new List<GameObject>();
 
     // Start is called before the first frame update
     void Awake()
@@ -28,19 +29,25 @@ public class GameController : MonoBehaviour
         //Start Game
         gamePlayable = true;
         gameNavicable = true;
+        unitsSelectable = true;
     }
 
     public void AddPowerUpToTeam(int teamIndex, GameObject powerUpPrefab)
     {
         if (teamIndex == 0)
         {
-            allyPowerUps.Add(powerUpPrefab);
             //UPDATE INVENTORY
+            allyPowerUps.Add(Instantiate(powerUpPrefab, UIController.uiController.itemPanel));
+            UIController.uiController.UpdateInventoryUI();
+
         }
         else if (teamIndex == 1)
         {
-            enemyPowerUps.Add(powerUpPrefab);
             //APPLY TO ENEMY
+            //enemyPowerUps.Add(powerUpPrefab); //In the future this can be reapplied to this list if the AI is to hold powerups
+            Unit unitToEmpower = GetAllActiveUnitsOfTeam(teamIndex)[Random.Range(0, GetAllActiveUnitsOfTeam(teamIndex).Count - 1)].GetComponent<Unit>();
+            PowerUp powerUp = powerUpPrefab.GetComponent<PowerUp>();
+            powerUp.PowerUpUnit(unitToEmpower);
         }
     }
 
@@ -56,6 +63,8 @@ public class GameController : MonoBehaviour
         SpawnUnitsFromPool(level.alliesPool, allyCount);
         SpawnUnitsFromPool(level.enemiesPool, enemyCount);
         SpawnPowerUps(level.powerUpsPool, powerUpCount);
+
+        UIController.uiController.GenerateStatusUI();
     }
 
     void SpawnUnitsFromPool(GameObject[] pool, int amount)
@@ -63,7 +72,7 @@ public class GameController : MonoBehaviour
         for(int i = 0; i < amount; i++)
         {
             //Get a random unit
-            GameObject unit = pool[Random.Range(0, pool.Length-1)];
+            GameObject unit = pool[Random.Range(0, pool.Length)];
 
             //Run through until its spawned:
             bool spawned = false;
@@ -103,7 +112,7 @@ public class GameController : MonoBehaviour
         for (int i = 0; i < amount; i++)
         {
             //Get a random powerUp
-            GameObject powerUp = pool[Random.Range(0, pool.Length - 1)];
+            GameObject powerUp = pool[Random.Range(0, pool.Length)];
 
             //Run through until its spawned:
             bool spawned = false;
@@ -115,7 +124,7 @@ public class GameController : MonoBehaviour
                 //Make it 3D and offset it with the map origin (gamecontroller)
                 Vector3 spawnPoint = new Vector3(spawnPoint2D.x, level.levelYOffset, spawnPoint2D.y) + transform.position;
 
-                //Check to see if it intersects
+                //Check to see if it intersects units or other powerups
                 foreach (GameObject activeUnit in activeUnits)
                 {
                     //Get the minimum distance that should be between things
@@ -127,6 +136,19 @@ public class GameController : MonoBehaviour
                         break;
                     }
                 }
+                foreach (GameObject powerUps in activeWorldPowerUps)
+                {
+                    if (intersects == true) break;
+                    //Get the minimum distance that should be between things
+                    float minDistanceBetween = powerUps.GetComponent<SphereCollider>().radius + powerUp.GetComponent<SphereCollider>().radius + level.spawnSpacingMinimum;
+                    //If the spawn point and the currect unit being looped through are closer than that, stop this run of the loop
+                    if (Vector3.Distance(powerUps.transform.position, spawnPoint) < minDistanceBetween)
+                    {
+                        intersects = true;
+                        break;
+                    }
+                }
+
 
                 //If there are no intersection errors, instantiate the powerUp
                 if (!intersects)
@@ -157,6 +179,34 @@ public class GameController : MonoBehaviour
     public void RemoveWorldPowerUp(GameObject powerup)
     {
         activeWorldPowerUps.Remove(powerup);
+    }
+
+    public void RemovePowerUp(GameObject gameObject, int teamIndex)
+    {
+        //Remove powerups of a team from their list
+        if(teamIndex == 0)
+        {
+            foreach (GameObject powerUp in allyPowerUps)
+            {
+                if (gameObject == powerUp)
+                {
+                    allyPowerUps.Remove(powerUp);
+                    break;
+                }
+            }
+        }
+        else if (teamIndex == 1)
+        {
+            foreach (GameObject powerUp in enemyPowerUps)
+            {
+                if (gameObject == powerUp)
+                {
+                    allyPowerUps.Remove(powerUp);
+                    break;
+                }
+            }
+        }
+
     }
 
     private int GetTeamUnitCountInActiveUnits(int teamIndex)
@@ -200,12 +250,14 @@ public class GameController : MonoBehaviour
 
         //End Game
         gamePlayable = false;
+        unitsSelectable = false;
     }
 
     public void RefreshGameLevel()
     {
         gamePlayable = true;
         gameNavicable = true;
+        unitsSelectable = true;
         foreach(GameObject unit in activeUnits)
         {
             Destroy(unit);
@@ -216,6 +268,10 @@ public class GameController : MonoBehaviour
             Destroy(powerup);
         }
         activeWorldPowerUps = new List<GameObject>();
+        foreach(GameObject allyPowerUp in allyPowerUps)
+        {
+            Destroy(allyPowerUp);
+        }
         allyPowerUps = new List<GameObject>();
         enemyPowerUps = new List<GameObject>();
         SpawnUnitsInLevel();

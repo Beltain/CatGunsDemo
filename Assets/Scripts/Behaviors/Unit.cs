@@ -7,7 +7,7 @@ public class Unit : MonoBehaviour
 {
     //Attributes
     [SerializeField] protected float combatRadius = 2.5f;
-    [SerializeField] protected float launchSpeed = 50f;
+    [SerializeField] public float launchSpeed = 50f;
     [SerializeField] public int teamIndex = 0;
     [SerializeField] public float attackDamageBase = 50f;
 
@@ -17,8 +17,8 @@ public class Unit : MonoBehaviour
     protected float currentAttackAllieBoosted = 0f;
 
     //Vitality
-    [SerializeField] public Status health;
-    [SerializeField] public Status stamina;
+    [SerializeField] public Status health = new Status();
+    [SerializeField] public Status stamina = new Status();
 
     //State Handling
     public enum UnitState { idle, attacking, stunned };
@@ -35,11 +35,6 @@ public class Unit : MonoBehaviour
     private void Start()
     {
         UnitSetup();
-    }
-
-    private void Update()
-    {
-
     }
 
     private void UnitSetup()
@@ -78,14 +73,14 @@ public class Unit : MonoBehaviour
 
     private void CalculateCombatOutcome(Unit enemyUnit)
     {
-        Debug.Log("Combat Initiated");
+        //Debug.Log("Combat Initiated");
         switch (enemyUnit.combatState)
         {
             case (UnitState.attacking):
                 //Check to make sure the enemy unit is within the attack angle
                 if(Vector3.Angle(transform.forward, enemyUnit.transform.position - transform.position) <= CombatController.combatController.combat.attackAngle)
                 {
-                    Debug.Log("Enemy Unit within the attack radius of " + gameObject.name);
+                    //Debug.Log("Enemy Unit within the attack radius of " + gameObject.name);
                     //When this unit lands an attack but the other unit is also attacking, do this
                     if (Vector3.Angle(enemyUnit.transform.forward, transform.position - enemyUnit.transform.position) <= CombatController.combatController.combat.attackAngle)
                     {
@@ -93,13 +88,13 @@ public class Unit : MonoBehaviour
                         //Isolate one unit to play the parry effects, as both would if not specified
                         if(enemyUnit.teamIndex > teamIndex)
                         {
-                            Debug.Log(enemyUnit.gameObject.name + " and " + gameObject.name + " Parried");
+                            //Debug.Log(enemyUnit.gameObject.name + " and " + gameObject.name + " Parried");
                         }
                     }
                     else
                     {
                         //Deal Damage Code
-                        Debug.Log("Attack landed on " + enemyUnit.gameObject.name + " despite them attack as well");
+                        //Debug.Log("Attack landed on " + enemyUnit.gameObject.name + " despite them attack as well");
                         DealAttack(enemyUnit);
                     }
                 }
@@ -121,7 +116,7 @@ public class Unit : MonoBehaviour
     private void DealAttack(Unit enemyUnit)
     {
         enemyUnit.TakeDamage(attackDamageBase * (launchPower + currentAttackAllieBoosted) );
-        Debug.Log(enemyUnit.gameObject.name + " took damage");
+        //Debug.Log(enemyUnit.gameObject.name + " took damage");
         currentAttackAllieBoosted = 0f;
     }
 
@@ -182,8 +177,6 @@ public class Unit : MonoBehaviour
     void StartStatusTicker()
     {
         List<Status> vitality = new List<Status>();
-        health = new Status();
-        stamina = new Status();
 
         vitality.Add(health);
         vitality.Add(stamina);

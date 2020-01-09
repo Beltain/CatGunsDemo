@@ -12,5 +12,6 @@ public class CombatProfile_SO : ScriptableObject
     public float gameSpeedMultiplier = 1f;
     public float secondsBeforeStart = 2f;
     public float attackChoreographyTime = 1f;
+    public float unitSelectionRadius = 5f;
     
 }

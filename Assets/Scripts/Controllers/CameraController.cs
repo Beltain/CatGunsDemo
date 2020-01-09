@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class CameraController : MonoBehaviour
 {
+    public static CameraController cameraController;
+
     IEnumerator TouchChecker;
     IEnumerator TouchDeltasCalculator;
 
@@ -23,18 +25,27 @@ public class CameraController : MonoBehaviour
 
 
     protected Camera cam;
-    [SerializeField] protected Vector2 zoomLimits = new Vector2(10f, 15f);
+    [SerializeField] public Vector2 zoomLimits = new Vector2(15f, 25f);
+    [SerializeField] public float startZoom = 20f;
     [SerializeField] protected float zoomSpeed = 1f;
     [SerializeField] protected float scrollSpeed = 1f;
 
     private void Start()
     {
         cam = Camera.main;
+        cam.orthographicSize = Mathf.Clamp(startZoom, zoomLimits.x, zoomLimits.y);
+        cameraController = this;
     }
 
     private void Update()
     {
-        if(GameController.gameNavicable)GetTouchInput();
+        if (GameController.gameNavicable) GetTouchInput();
+        else if(TouchChecker != null)
+        {
+            //reset input check
+            StopCoroutine(TouchChecker);
+            TouchChecker = null;
+        }
     }
 
     private void GetTouchInput()
@@ -63,37 +74,34 @@ public class CameraController : MonoBehaviour
         //CheckTouch Updater
         while (Input.touchCount > 0)
         {
-            //Calculate touch mean position
-            touchPosition = GetMeanPositionFromTouches();
+            //Calculate touch drag angle from mean position and pivot position
+            dragVector = startTouchPivotPosition - touchPosition;
+            dragVector *= 0.015f * scrollSpeed;
 
+            //Calculate touch mean position
+            touchPosition = Input.touches[0].position; //previously: GetMeanPositionFromTouches();
+            if(Input.touchCount == 1)
+            {
+                if(cameraMoveState == MoveStates.zooming)
+                {
+                    cameraMoveState = MoveStates.scrolling;
+                    startTouchPivotPosition = GetMeanPositionFromTouches();
+                    startPivotPosition = transform.position;
+                    dragVector = Vector2.zero;
+                }
+                transform.position = startPivotPosition + new Vector3(dragVector.x, 0f, dragVector.y);
+            }
 
             //If the player is using 2 fingers, calculate the change in touch if any
-            if (Input.touchCount == 2)
+            else if (Input.touchCount == 2)
             {
-                //Calculate touch drag angle from mean position and pivot position
-                dragVector = startTouchPivotPosition - touchPosition;
-                dragVector *= 0.015f * scrollSpeed;
-
-                if (cameraMoveState == MoveStates.zooming)
-                {
-                    //Check if it's still zooming, if it is, change the zoom
-                    if (Mathf.Abs(pinchDelta) < pinchStartStopTriggers.x && touchDelta > touchDeltaStartStayTrigger.x)
-                    {
-                        cameraMoveState = MoveStates.scrolling;
-                        startTouchPivotPosition = GetMeanPositionFromTouches();
-                        startPivotPosition = transform.position;
-                        dragVector = Vector2.zero;
-                    }
-                    else cam.orthographicSize = Mathf.Clamp(cam.orthographicSize + -pinchDelta * 0.010f * zoomSpeed, zoomLimits.x, zoomLimits.y);
-                }
-                else if(cameraMoveState == MoveStates.scrolling)
-                {
-                    //Check if it's still scrolling, if it is, change the camera transform
-                    if (Mathf.Abs(pinchDelta) > pinchStartStopTriggers.y && touchDelta < touchDeltaStartStayTrigger.y) cameraMoveState = MoveStates.zooming;
-                    else transform.position = startPivotPosition + new Vector3(dragVector.x, 0f, dragVector.y);
-                }
+                if (cameraMoveState == MoveStates.scrolling) cameraMoveState = MoveStates.zooming;
+                cam.orthographicSize = Mathf.Clamp(cam.orthographicSize + -pinchDelta * 0.010f * zoomSpeed, zoomLimits.x, zoomLimits.y);
+                UIController.uiController.ChangeStatusScaleUIToMatchZoom();
             }
+
             yield return null;
+
         }
 
         ResetTouchCheckers();
