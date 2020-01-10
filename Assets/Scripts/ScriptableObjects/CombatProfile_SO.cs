@@ -13,5 +13,6 @@ public class CombatProfile_SO : ScriptableObject
     public float secondsBeforeStart = 2f;
     public float attackChoreographyTime = 1f;
     public float unitSelectionRadius = 5f;
+    public float minTimeBetweenActions = 5f;
     
 }

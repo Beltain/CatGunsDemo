@@ -5,8 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(Unit))]
 public class BasicEnemyAI : MonoBehaviour
 {
-    private enum Strategy { aggressive, protective, assistive };
-    private Strategy strat = Strategy.aggressive;
+    public enum Strategy { aggressive, protective, assistive };
+    public Strategy strat = Strategy.aggressive;
 
     Unit unit;
 
@@ -15,7 +15,8 @@ public class BasicEnemyAI : MonoBehaviour
     [SerializeField] protected Vector2 protectiveBubbleRadius = new Vector2(4f, 6f);
     [SerializeField] protected float escapeSpeedMultiplier = 2f;
     IEnumerator AISequencer;
-    IEnumerator StrategySequencer;
+    public IEnumerator StrategySequencer;
+    public IEnumerator LaunchSequencer;
 
 
     private void Start()
@@ -31,7 +32,7 @@ public class BasicEnemyAI : MonoBehaviour
     IEnumerator AISequence()
     {
         //Pause to allow player to get accustomed to the level
-        yield return new WaitForSecondsRealtime(CombatController.combatController.combat.secondsBeforeStart);
+        yield return new WaitForSecondsRealtime(CombatController.combatController.combat.secondsBeforeStart + Random.Range(0f, 2f));
 
         //Every random amount of seconds, choose a strategy and perform it
         float timeTillNextChange = 0f; 
@@ -39,39 +40,43 @@ public class BasicEnemyAI : MonoBehaviour
         {
             if (GameController.gamePlayable)
             {
-                //cease previous strat
-                if (StrategySequencer != null) StopCoroutine(StrategySequencer);
-
-                timeTillNextChange += Random.Range(timeRangeBetweenMoves.x, timeRangeBetweenMoves.y) * CombatController.combatController.combat.gameSpeedMultiplier;
-                //Randomise the next strat
-                float stratChangeNumber = Random.Range(0f, 1f);
-                if (0f <= stratChangeNumber && stratChangeNumber < 0.5f)
+                //Only attack if idle
+                if(unit.combatState == Unit.UnitState.idle)
                 {
-                    //AGGRESIVE FOCUS
-                    StrategySequencer = AggresiveStrategy(timeTillNextChange);
-                }
-                else if (0.5 <= stratChangeNumber && stratChangeNumber < 0.8f)
-                {
-                    //PROTECTIVE FOCUS
-                    StrategySequencer = ProtectiveStrategy(timeTillNextChange);
-                }
-                else if (0.8 <= stratChangeNumber && stratChangeNumber < 1.0f)
-                {
-                    //ASSISTIVE FOCUS
-                    StrategySequencer = AssistiveStrategy(timeTillNextChange);
-                }
+                    //cease previous strat
+                    if (StrategySequencer != null) StopCoroutine(StrategySequencer);
 
-                StartCoroutine(StrategySequencer);
+                    timeTillNextChange += Random.Range(timeRangeBetweenMoves.x, timeRangeBetweenMoves.y) * CombatController.combatController.combat.gameSpeedMultiplier;
+                    //Randomise the next strat
+                    float stratChangeNumber = Random.Range(0f, 1f);
+                    if (0f <= stratChangeNumber && stratChangeNumber < 0.5f)
+                    {
+                        //AGGRESIVE FOCUS
+                        StrategySequencer = AggresiveStrategy(timeTillNextChange);
+                    }
+                    else if (0.5 <= stratChangeNumber && stratChangeNumber < 0.8f)
+                    {
+                        //PROTECTIVE FOCUS
+                        StrategySequencer = ProtectiveStrategy(timeTillNextChange);
+                    }
+                    else if (0.8 <= stratChangeNumber && stratChangeNumber < 1.0f)
+                    {
+                        //ASSISTIVE FOCUS
+                        StrategySequencer = AssistiveStrategy(timeTillNextChange);
+                    }
 
-                //WAIT FOR THE NEXT CHANGE
-                while (timeTillNextChange > 0f)
-                {
-                    timeTillNextChange -= Time.deltaTime;
-                    yield return null;
+                    StartCoroutine(StrategySequencer);
+
+                    //WAIT FOR THE NEXT CHANGE
+                    while (timeTillNextChange > 0f)
+                    {
+                        timeTillNextChange -= Time.deltaTime;
+                        yield return null;
+                    }
                 }
-
             }
             else break;
+            yield return null;
         }
     }
 
@@ -85,7 +90,8 @@ public class BasicEnemyAI : MonoBehaviour
         Vector3 target = enemyTeam[Random.Range(0, enemyTeam.Count-1)].transform.position;
 
         //Launch at
-        StartCoroutine(LaunchUnitAt(target, duration));
+        LaunchSequencer = LaunchUnitAt(target, duration);
+        StartCoroutine(LaunchSequencer);
 
         yield return null;
     }
@@ -109,7 +115,8 @@ public class BasicEnemyAI : MonoBehaviour
                     if (Vector3.Distance(enemy.transform.position, transform.position) < protectiveRadius)
                     {
                         //If an enemy has breached the detection radius, get the shit outa there faster than usual
-                        StartCoroutine(LaunchUnitAt(-(enemy.transform.position - transform.position) * 100f, duration / escapeSpeedMultiplier));
+                        LaunchSequencer = LaunchUnitAt(-(enemy.transform.position - transform.position) * 100f, duration / escapeSpeedMultiplier);
+                        StartCoroutine(LaunchSequencer);
                         enemyBreached = true;
                         break;
                     }
@@ -141,33 +148,43 @@ public class BasicEnemyAI : MonoBehaviour
         }
 
         //Fire toward the nearest ally
-        StartCoroutine(LaunchUnitAt(nearestAlly.position, duration));
+        LaunchSequencer = LaunchUnitAt(nearestAlly.position, duration);
+        StartCoroutine(LaunchSequencer);
 
         yield return null;
     }
 
     IEnumerator LaunchUnitAt(Vector3 target, float maxDuration)
     {
-        //look at target
-        unit.AimToward(target);
-
         //Get randomised launch force
         float launchPower = Random.Range(attackPowerRange.x, attackPowerRange.y);
         launchPower = Mathf.Clamp(launchPower, 0f, unit.stamina.currentValue / (unit.attackDamageBase * launchPower));
 
+        //look at target
+        unit.EnableAimReticule(true);
+        unit.AimToward(target, launchPower);
+
         //Choreograph move, making sure the choreography doesnt take too much time up
         float drawTime = Mathf.Clamp(CombatController.combatController.combat.attackChoreographyTime, 0f, maxDuration * 0.8f);
+        float startDrawTime = drawTime;
+        float drawPercentage = 0f;
         while (drawTime > 0f)
         {
             //DO THIS BEFORE LAUNCHING
             //Debug.Log("Launching in " + drawTime + " seconds");
+            drawPercentage = (startDrawTime - (drawTime / startDrawTime));
+            unit.AimToward(target, drawPercentage);
             drawTime -= Time.deltaTime;
             yield return null;
         }
-
         //Launch
         unit.Launch(launchPower);
+    }
 
+    public void StopLaunch()
+    {
+        if(LaunchSequencer != null)StopCoroutine(LaunchSequencer);
+        unit.EnableAimReticule(false);
     }
 
 }

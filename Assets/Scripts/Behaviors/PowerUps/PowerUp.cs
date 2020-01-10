@@ -33,6 +33,6 @@ public class PowerUp : MonoBehaviour , IPointerDownHandler
 
     void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
     {
-        UIController.uiController.StartMovePowerUp(transform);
+        if(GameController.gamePlayable) UIController.uiController.StartMovePowerUp(transform);
     }
 }

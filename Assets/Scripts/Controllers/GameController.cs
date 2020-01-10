@@ -45,6 +45,7 @@ public class GameController : MonoBehaviour
         {
             //APPLY TO ENEMY
             //enemyPowerUps.Add(powerUpPrefab); //In the future this can be reapplied to this list if the AI is to hold powerups
+            powerUpPrefab = Instantiate(powerUpPrefab);
             Unit unitToEmpower = GetAllActiveUnitsOfTeam(teamIndex)[Random.Range(0, GetAllActiveUnitsOfTeam(teamIndex).Count - 1)].GetComponent<Unit>();
             PowerUp powerUp = powerUpPrefab.GetComponent<PowerUp>();
             powerUp.PowerUpUnit(unitToEmpower);

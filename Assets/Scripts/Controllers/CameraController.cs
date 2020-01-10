@@ -39,13 +39,13 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
-        if (GameController.gameNavicable) GetTouchInput();
+       /* if (GameController.gameNavicable) GetTouchInput();
         else if(TouchChecker != null)
-        {
+        { */
             //reset input check
-            StopCoroutine(TouchChecker);
-            TouchChecker = null;
-        }
+           // StopCoroutine(TouchChecker);
+          //  TouchChecker = null;
+       // }
     }
 
     private void GetTouchInput()

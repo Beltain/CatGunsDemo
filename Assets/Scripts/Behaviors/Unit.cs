@@ -12,11 +12,15 @@ public class Unit : MonoBehaviour
     [SerializeField] public float attackDamageBase = 50f;
 
     //Current States
+    public float attackCooldownBase;
+    public Vector2 attackCooldownRange = new Vector2(1f, 4f);
     protected float launchPower = 1f; //Range: 0 - 1
     public float nextAttackAllieBoosted = 0f; //Can increase indefinitely
     protected float currentAttackAllieBoosted = 0f;
+    bool justReceivedDamage = false;
 
     //Vitality
+    [SerializeField] public Status attackCooldown;
     [SerializeField] public Status health = new Status();
     [SerializeField] public Status stamina = new Status();
 
@@ -31,6 +35,8 @@ public class Unit : MonoBehaviour
     //Components
     protected SphereCollider boundSphere;
     protected Rigidbody rigidbody;
+    [SerializeField] protected Transform[] aimReticule = { null, null };
+    [SerializeField] protected Color[] aimReticuleStageGradient;
 
     private void Start()
     {
@@ -43,7 +49,13 @@ public class Unit : MonoBehaviour
         boundSphere.radius = combatRadius;
         rigidbody = GetComponent<Rigidbody>();
 
+        attackCooldownBase = Random.Range(attackCooldownRange.x, attackCooldownRange.y);
+        attackCooldown = new Status(attackCooldownBase, 0f, 0f, -1f, 0f);
+
         combatState = UnitState.idle;
+        
+        FaceCamera();
+        EnableAimReticule(false);
 
         StartStatusTicker();
     }
@@ -56,15 +68,20 @@ public class Unit : MonoBehaviour
         //See if the collider hit was another unit, and if it was on an enemy team
         if(collision.gameObject.GetComponent<Unit>() != null)
         {
+            
             Unit unitHit = collision.gameObject.GetComponent<Unit>();
             if(unitHit.teamIndex != teamIndex && combatState == UnitState.attacking)
             {
                 //Combat Code
                 CalculateCombatOutcome(unitHit);
+
+                Debug.Log(collision.gameObject.name);
             }
+
             else if(unitHit.teamIndex == teamIndex && combatState == UnitState.attacking)
             {
                 //Allie Boost Code
+                UIController.uiController.PopupAlertUI(UIController.boostedMessage, unitHit.transform.position);
                 unitHit.nextAttackAllieBoosted += launchPower + currentAttackAllieBoosted;
                 currentAttackAllieBoosted = 0f;
             }
@@ -89,6 +106,7 @@ public class Unit : MonoBehaviour
                         if(enemyUnit.teamIndex > teamIndex)
                         {
                             //Debug.Log(enemyUnit.gameObject.name + " and " + gameObject.name + " Parried");
+                            UIController.uiController.PopupAlertUI(UIController.parriedMessage, (transform.position + enemyUnit.transform.position) / 2f);
                         }
                     }
                     else
@@ -102,8 +120,14 @@ public class Unit : MonoBehaviour
 
             default:
                 //When this unit lands an attack, do this
+                //Interrupt the other units attack
+                if(enemyUnit.teamIndex == 1)
+                {
+                    enemyUnit.GetComponent<BasicEnemyAI>().StopLaunch();
+                }
+
                 //check if the enemy unit is in the attack radius
-                Debug.Log("Attack landed on " + enemyUnit.gameObject.name);
+                //Debug.Log("Attack landed on " + enemyUnit.gameObject.name);
                 if (Vector3.Angle(transform.forward, enemyUnit.transform.position - transform.position) <= CombatController.combatController.combat.attackAngle)
                 {
                     //Deal damage code
@@ -141,6 +165,10 @@ public class Unit : MonoBehaviour
     {
         //Use Stamina
         UseStamina(attackDamageBase * launchPower);
+        //Start Cooldown
+        attackCooldown.currentValue = attackCooldownBase;
+        //remove aim
+        EnableAimReticule(false);
 
         //Set State
         combatState = UnitState.attacking;
@@ -159,15 +187,59 @@ public class Unit : MonoBehaviour
         launchPower = 0f;
         currentAttackAllieBoosted = 0f;
 
-        //Unset State
-        combatState = UnitState.idle;
+        //Set inactive during cooldown and face the unit forward
+        StartCoroutine(CoolDownSequence());
 
     }
 
-    public void AimToward(Vector3 target)
+    public void AimToward(Vector3 target, float power)
     {
         //Look toward a spot in the world but dont look up/down
         transform.LookAt(new Vector3(target.x, transform.position.y, target.z));
+
+        //Adjust according to draw power
+        AdjustAimReticuleSizeAndColor(power);
+    }
+
+    #endregion
+
+    #region Aiming Visuals
+    public void EnableAimReticule(bool state)
+    {
+        foreach (Transform aimRet in aimReticule)
+        {
+            aimRet.gameObject.SetActive(state);
+        }
+    }
+
+    public void AdjustAimReticuleSizeAndColor(float size)
+    {
+        //get the current power bracket and assign it the right color
+        Color sizeChosenColor;
+        if (size <= 0.2f) sizeChosenColor = aimReticuleStageGradient[0];
+        else if (size > 0.2f && size <= 0.4f) sizeChosenColor = aimReticuleStageGradient[1];
+        else if (size > 0.4f && size <= 0.6f) sizeChosenColor = aimReticuleStageGradient[2];
+        else if (size > 0.6f && size <= 0.8f) sizeChosenColor = aimReticuleStageGradient[3];
+        else sizeChosenColor = aimReticuleStageGradient[4];
+
+        //Change the size of the reticules according to game settings
+        size *= CombatController.combatController.combat.maxPowerRange/16f;
+        size = Mathf.Clamp(size, 0f, CombatController.combatController.combat.maxPowerRange/16f);
+        foreach (Transform aimRet in aimReticule)
+        {
+            aimRet.localScale = Vector3.one * size;
+            //Get each renderer, go through it and make sure all materials are changed
+            Renderer[] rendersToChange = aimRet.gameObject.GetComponentsInChildren<Renderer>();
+            foreach (Renderer rend in rendersToChange)
+            {
+                rend.material.SetColor("_BaseColor", sizeChosenColor);
+            }
+        }
+    }
+
+    public void FaceCamera()
+    {
+        transform.LookAt(new Vector3(Camera.main.gameObject.transform.position.x, transform.position.y, -10000f));
     }
 
     #endregion
@@ -180,6 +252,7 @@ public class Unit : MonoBehaviour
 
         vitality.Add(health);
         vitality.Add(stamina);
+        vitality.Add(attackCooldown);
 
         if (StatusTicker != null) StopCoroutine(StatusTicker);
         StatusTicker = TickVitality(vitality);
@@ -190,26 +263,41 @@ public class Unit : MonoBehaviour
     {
         while (true)
         {
-            foreach (Status vitality in vitalities)
+            if (GameController.gamePlayable)
             {
-                //Tick the value of the vitality each frame
-                vitality.currentValue = Mathf.Clamp(vitality.currentValue + (vitality.regenRate + vitality.buffs) * Time.deltaTime, vitality.minValue, vitality.maxValue);
 
-                //And smooth the smoothed value to the current over time
-                if (vitality.smoothedValue != vitality.currentValue)
+                foreach (Status vitality in vitalities)
                 {
-                    vitality.smoothedValue = Mathf.Lerp(vitality.smoothedValue, vitality.currentValue, Time.deltaTime * 1f);
-                    if (Mathf.Abs(vitality.currentValue - vitality.smoothedValue) < 0.1f) vitality.smoothedValue = vitality.currentValue;
+                    //Tick the value of the vitality each frame
+                    vitality.currentValue = Mathf.Clamp(vitality.currentValue + (vitality.regenRate + vitality.buffs) * Time.deltaTime, vitality.minValue, vitality.maxValue);
+
+                    //And smooth the smoothed value to the current over time
+                    if (vitality.smoothedValue != vitality.currentValue)
+                    {
+                        vitality.smoothedValue = Mathf.Lerp(vitality.smoothedValue, vitality.currentValue, Time.deltaTime * 1f);
+                        if (Mathf.Abs(vitality.currentValue - vitality.smoothedValue) < 0.1f) vitality.smoothedValue = vitality.currentValue;
+                    }
                 }
+                yield return null;
             }
-            yield return null;
+            else yield return null;
         }
     }
 
     public void TakeDamage(float damage)
     {
-        health.currentValue = Mathf.Clamp(health.currentValue - damage, health.minValue, health.maxValue);
-        if (health.currentValue == 0f) Die();
+        if (!justReceivedDamage)
+        {
+            justReceivedDamage = true;
+            health.currentValue = Mathf.Clamp(health.currentValue - damage, health.minValue, health.maxValue);
+            UIController.uiController.PopupAlertUI(Mathf.RoundToInt(damage).ToString(), transform.position);
+            if (health.currentValue == 0f) Die();
+            Invoke("JustReceivedDamage", 0.1f);
+        }
+    }
+    private void JustReceivedDamage()
+    {
+        justReceivedDamage = false;
     }
 
     public void UseStamina(float amount)
@@ -226,6 +314,18 @@ public class Unit : MonoBehaviour
     public void SetStamina(float value)
     {
         stamina.currentValue = Mathf.Clamp(stamina.currentValue, stamina.minValue, stamina.maxValue);
+    }
+
+    IEnumerator CoolDownSequence()
+    {
+        //keep unit stunned until it's cooldown has lapsed
+        combatState = UnitState.stunned;
+        while (attackCooldown.currentValue != 0f)
+        {
+            yield return null;
+        }
+        combatState = UnitState.idle;
+        FaceCamera();
     }
 
     private void Die()

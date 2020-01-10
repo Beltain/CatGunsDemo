@@ -15,7 +15,6 @@ public class PowerUpObject : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        int selectableLayermask = 1 << 8;
         if (other.gameObject.GetComponent<Unit>() != null)
         {
             GameController.gameController.AddPowerUpToTeam(other.gameObject.GetComponent<Unit>().teamIndex, powerUp);

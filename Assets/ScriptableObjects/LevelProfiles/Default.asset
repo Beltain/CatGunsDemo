@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arenaRadius: 20
   enemyQuantity: {x: 4, y: 5}
-  allyQuantity: {x: 3, y: 4}
+  allyQuantity: {x: 2, y: 2}
   powerUpQuantity: {x: 2, y: 6}
   alliesPool:
   - {fileID: 1376249910529751797, guid: a60fc3d54450b444cabbb711f94c419a, type: 3}

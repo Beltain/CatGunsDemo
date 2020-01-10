@@ -17,6 +17,14 @@ public class UIController : MonoBehaviour
     [SerializeField] protected Transform statusPanel;
 
 
+    //Alert UI
+    [SerializeField] protected List<GameObject> alertUIs = new List<GameObject>();
+    [SerializeField] protected GameObject alertUIPrefab;
+    [SerializeField] protected Transform alertUIPanel;
+    public static string parriedMessage = "Parried!";
+    public static string boostedMessage = "Boosted!";
+
+
     IEnumerator dragSequencer;
 
     private void Awake()
@@ -52,7 +60,6 @@ public class UIController : MonoBehaviour
         while (Input.touchCount == 1)
         {
             powerUpToMove.position = Input.mousePosition;
-            Debug.Log(Input.touchCount);
             yield return null;
         }
 
@@ -64,7 +71,10 @@ public class UIController : MonoBehaviour
         {
             if(hitInfo.collider.gameObject.GetComponent<Unit>() != null)
             {
-                powerUpToMove.gameObject.GetComponent<PowerUp>().PowerUpUnit(hitInfo.collider.gameObject.GetComponent<Unit>());
+                if(hitInfo.collider.gameObject.GetComponent<Unit>().teamIndex == CombatController.combatController.combat.playerTeamIndex)
+                {
+                    powerUpToMove.gameObject.GetComponent<PowerUp>().PowerUpUnit(hitInfo.collider.gameObject.GetComponent<Unit>());
+                }
             }
         }
 
@@ -116,6 +126,34 @@ public class UIController : MonoBehaviour
         }
     }
 
-    #endregion 
+    #endregion
+
+    #region Alert UI
+    bool justattacked = false;
+    public void PopupAlertUI(string alert, Vector3 worldPos)
+    {
+        Debug.Log(alert + "   " + worldPos);
+        GameObject alertUIToUse = AddAlertUI();
+        alertUIToUse.transform.position = Camera.main.WorldToScreenPoint(worldPos);
+        alertUIToUse.GetComponent<AlertTextUI>().DisplayAlert(alert);
+    }
+
+    GameObject AddAlertUI()
+    {
+        GameObject alertUIToUse = null;
+        foreach(GameObject alertUI in alertUIs)
+        {
+            if (!alertUI.activeInHierarchy) alertUIToUse = alertUI;
+        }
+        if(alertUIToUse == null)
+        {
+            alertUIToUse = Instantiate(alertUIPrefab, alertUIPanel);
+            alertUIs.Add(alertUIToUse);
+        }
+        alertUIToUse.SetActive(true);
+        return alertUIToUse;
+    }
+
+    #endregion
 
 }

@@ -29,7 +29,7 @@ public class CombatController : MonoBehaviour
             {
                 //Get the closest unit in range and if it's in the player's team, continue to aim
                 Unit unit = GetClosestSelectableUnit(combat.playerTeamIndex);
-                if (unit.combatState != Unit.UnitState.stunned && unit.teamIndex == combat.playerTeamIndex)
+                if (unit.combatState == Unit.UnitState.idle && unit.teamIndex == combat.playerTeamIndex)
                 {
                     if (AimSequencer != null) StopCoroutine(AimSequencer);
                     AimSequencer = AimSequence(unit);
@@ -72,6 +72,8 @@ public class CombatController : MonoBehaviour
     {
         //Stop camera movement
         GameController.gameNavicable = false;
+        //Draw aim reticules
+        unit.EnableAimReticule(true);
 
         float launchPower = 0f;
 
@@ -80,14 +82,17 @@ public class CombatController : MonoBehaviour
         {
             //Get the potential power of the launch of the player released the aim at this moment
             launchPower = GetLaunchPower(unit);
-            Debug.Log("Current launch power is " + launchPower);
+            //Debug.Log("Current launch power is " + launchPower);
 
             //Face unit toward opposite of mouse position in world
-            unit.AimToward((-(GetMousePointInWorld() - unit.transform.position))*100f);
+            unit.AimToward((-(GetMousePointInWorld() - unit.transform.position))*100f, launchPower);
             yield return null;
         }
         //and Launch
         unit.Launch(launchPower);
+
+        //Remove aim reticules
+        unit.EnableAimReticule(false) ;
 
         GameController.gameNavicable = true;
     }
