@@ -18,6 +18,10 @@ MonoBehaviour:
   alliedPowerBoostLimit: 5
   gameSpeedMultiplier: 1
   secondsBeforeStart: 2
-  attackChoreographyTime: 0.2
+  attackChoreographyTime: 1
   unitSelectionRadius: 6
   minTimeBetweenActions: 3
+  attackDisruptionInSeconds: 1.5
+  playerMoveTimeSlow: 0.07
+  minimumLaunchPower: 0.25
+  selectionRingPrefab: {fileID: 191608, guid: 087da436576d35542825d392925d79c4, type: 3}

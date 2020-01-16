@@ -11,7 +11,7 @@ public class BasicEnemyAI : MonoBehaviour
     Unit unit;
 
     [SerializeField] protected Vector2 timeRangeBetweenMoves = new Vector2(2f, 5f);
-    [SerializeField] protected float unitAimTime = 1f;
+    [SerializeField] protected float unitAimTimeMultiplier = 1f;
     [SerializeField] protected Vector2 attackPowerRange = new Vector2(0.5f, 1f);
     [SerializeField] protected Vector2 protectiveBubbleRadius = new Vector2(4f, 6f);
     [SerializeField] protected float escapeSpeedMultiplier = 2f;
@@ -167,23 +167,24 @@ public class BasicEnemyAI : MonoBehaviour
 
         //Choreograph move, making sure the choreography doesnt take too much time up
         float drawTime = Mathf.Clamp(CombatController.combatController.combat.attackChoreographyTime, 0f, maxDuration * 0.8f);
-        float startDrawTime = drawTime;
+        float startDrawTime = drawTime * unitAimTimeMultiplier;
         float drawPercentage = 0f;
         while (drawTime > 0f)
         {
             //DO THIS BEFORE LAUNCHING
             //Debug.Log("Launching in " + drawTime + " seconds");
-            drawPercentage = (1f - (drawTime / startDrawTime));
+            drawPercentage = (1f - (drawTime / (startDrawTime * unitAimTimeMultiplier)));
             unit.AimToward(target, drawPercentage);
             drawTime -= Time.deltaTime;
             yield return null;
         }
+        /*
         float aimTime = unitAimTime;
         while(aimTime > 0f)
         {
             aimTime -= Time.deltaTime * CombatController.combatController.combat.gameSpeedMultiplier;
             yield return null;
-        }
+        }*/
         //Launch
         unit.Launch(launchPower);
     }

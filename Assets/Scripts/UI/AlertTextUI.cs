@@ -30,7 +30,7 @@ public class AlertTextUI : MonoBehaviour
         {
             transform.position += new Vector3(0f, travelUpSpeed * Time.deltaTime, 0f);
             alertText.color = Color.Lerp(startStopLerpColors[0], startStopLerpColors[1], 1f - (durationLeft / duration));
-            durationLeft = Mathf.Clamp(durationLeft - Time.deltaTime, 0f, duration);
+            durationLeft = Mathf.Clamp(durationLeft - Time.unscaledDeltaTime, 0f, duration);
             yield return null;
         }
         StopCoroutine();

@@ -15,5 +15,8 @@ public class CombatProfile_SO : ScriptableObject
     public float unitSelectionRadius = 5f;
     public float minTimeBetweenActions = 5f;
     public float attackDisruptionInSeconds = 1.5f;
+    public float playerMoveTimeSlow = 0.07f;
+    public float minimumLaunchPower = 0.1f;
+    public GameObject selectionRingPrefab;
 
 }

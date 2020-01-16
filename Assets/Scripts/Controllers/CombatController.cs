@@ -23,7 +23,7 @@ public class CombatController : MonoBehaviour
 
     void CheckUnitSelectInput()
     {
-        if (Input.GetMouseButtonDown(0) && Input.touchCount == 1)
+        if (Input.GetMouseButtonDown(0) && Input.touchCount > 0)
         {
             if (GetClosestSelectableUnit(combat.playerTeamIndex) != null)
             {
@@ -36,6 +36,16 @@ public class CombatController : MonoBehaviour
                     StartCoroutine(AimSequencer);
                 }
             }
+            else
+            {
+                //Set the time scale to normal
+                Time.timeScale = 1f;
+            }
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            GameController.gameController.SetTimeScale("Play");
         }
 
     }
@@ -76,12 +86,14 @@ public class CombatController : MonoBehaviour
         unit.EnableAimReticule(true);
 
         float launchPower = 0f;
+        float unscaledLaunchPower = 0f;
 
         //While they're holding
-        while (Input.GetMouseButton(0) && Input.touchCount == 1 && unit != null)
+        while (Input.GetMouseButton(0) && Input.touchCount > 0 && unit != null)
         {
             //Get the potential power of the launch of the player released the aim at this moment
             launchPower = GetLaunchPower(unit);
+            unscaledLaunchPower = Mathf.Clamp(Vector3.Distance(GetMousePointInWorld(), unit.transform.position) / combat.maxPowerRange, 0f, 1f);
             //Debug.Log("Current launch power is " + launchPower);
 
             //Face unit toward opposite of mouse position in world
@@ -89,7 +101,8 @@ public class CombatController : MonoBehaviour
             yield return null;
         }
         //and Launch
-        unit.Launch(launchPower);
+        Debug.Log(unscaledLaunchPower);
+        if (unscaledLaunchPower > combat.minimumLaunchPower) unit.Launch(launchPower);
 
         //Remove aim reticules
         unit.EnableAimReticule(false) ;

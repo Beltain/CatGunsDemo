@@ -467,15 +467,18 @@ public class UIController : MonoBehaviour
     {
         float curVal = 0f;
         float endVal = GameController.gameController.reward;
-        float progress = 0f;
-        float speedUp = 10f;
-        while (progress != 1f)
+        if(endVal != 0f)
         {
-            if(Input.GetMouseButton(0)) progress = Mathf.Clamp(progress + (Time.deltaTime / rewardCountTime) * speedUp, 0f, 1f);
-            else progress = Mathf.Clamp(progress + (Time.deltaTime/rewardCountTime), 0f, 1f);
-            curVal = endVal * progress;
-            rewardText.text = rewardCurrencySymbol + (Mathf.FloorToInt(curVal)).ToString();
-            yield return null;
+            float progress = 0f;
+            float speedUp = 10f;
+            while (progress != 1f)
+            {
+                if (Input.GetMouseButton(0)) progress = Mathf.Clamp(progress + (Time.deltaTime / rewardCountTime) * speedUp, 0f, 1f);
+                else progress = Mathf.Clamp(progress + (Time.deltaTime / rewardCountTime), 0f, 1f);
+                curVal = endVal * progress;
+                rewardText.text = rewardCurrencySymbol + (Mathf.FloorToInt(curVal)).ToString();
+                yield return null;
+            }
         }
     }
 

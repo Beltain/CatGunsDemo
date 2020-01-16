@@ -47,6 +47,12 @@ TextureImporter:
   - first:
       213: -6429586013900950493
     second: Health_Icon
+  - first:
+      213: -2745872922174361907
+    second: VitalityBarLeft
+  - first:
+      213: 4724705678950107654
+    second: VitalityBarRight
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -364,7 +370,7 @@ TextureImporter:
         width: 132
         height: 132
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -385,7 +391,7 @@ TextureImporter:
         width: 132
         height: 132
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -406,7 +412,7 @@ TextureImporter:
         width: 98
         height: 99
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -427,7 +433,7 @@ TextureImporter:
         width: 98
         height: 99
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -448,7 +454,7 @@ TextureImporter:
         width: 98
         height: 99
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -469,7 +475,7 @@ TextureImporter:
         width: 98
         height: 99
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -477,6 +483,48 @@ TextureImporter:
       bones: []
       spriteID: 32eb11c2ca3e30347a1f6a409cad9173
       internalID: -6429586013900950493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VitalityBarLeft
+      rect:
+        serializedVersion: 2
+        x: 393
+        y: 287
+        width: 100
+        height: 200
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5cebe2d7426c4c94e9fe3083ab98855f
+      internalID: -2745872922174361907
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: VitalityBarRight
+      rect:
+        serializedVersion: 2
+        x: 493
+        y: 287
+        width: 100
+        height: 200
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 71db1362370e14d48b618ddfda179d8c
+      internalID: 4724705678950107654
       vertices: []
       indices: 
       edges: []

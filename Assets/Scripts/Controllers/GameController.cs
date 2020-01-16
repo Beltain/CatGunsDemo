@@ -13,11 +13,12 @@ public class GameController : MonoBehaviour
     [Space(10)][Header("Arena State")]
     [SerializeField] protected Transform arenaBounds;
     [SerializeField] public LevelProfile_SO level;
+    [SerializeField] protected int movableUnits = 0;
+    [SerializeField] public float reward = 0f;
 
     [Space(10)][Header("Spawned Entities")]
     [SerializeField] public List<GameObject> activeUnits = new List<GameObject>();
     [SerializeField] public List<GameObject> slainEnemyIcons = new List<GameObject>();
-    [SerializeField] public float reward = 0f;
     [SerializeField] protected List<GameObject> activeWorldPowerUps = new List<GameObject>();
     [SerializeField] public List<PowerUp> allyPowerUps = new List<PowerUp>();
     [SerializeField] public List<PowerUp> enemyPowerUps = new List<PowerUp>();
@@ -30,10 +31,10 @@ public class GameController : MonoBehaviour
     [SerializeField] public GameObject speedUpEffect;
     [SerializeField] public GameObject strengthUpEffect;
     [SerializeField] public GameObject staminaUpEffect;
+    [SerializeField] public GameObject boostEffect;
     enum GameState { MainMenu, Game, Paused, GameOver}
     GameState gameState = GameState.MainMenu;
 
-    //Powerup States
     [Space(10)][Header("Powerups")]
     IEnumerator PowerUPSpawnSequencer;
     [SerializeField] protected float powerUpSpawnFrequency = 5f;
@@ -59,8 +60,6 @@ public class GameController : MonoBehaviour
         gameController = this;
         if (arenaBounds == null) arenaBounds = GameObject.FindWithTag("MapBounds").transform;
 
-        Screen.SetResolution(640, 480, true);
-
         //Set initial game state
         SetGameState(GameState.MainMenu);
     }
@@ -77,7 +76,7 @@ public class GameController : MonoBehaviour
                 gameNavicable = false;
                 unitsSelectable = false;
                 uiNavicable = true;
-                Time.timeScale = 0f;
+                SetTimeScale("Pause");
                 break;
             case (GameState.Game):
                 UIController.uiController.SetUIPanel("Game");
@@ -85,7 +84,7 @@ public class GameController : MonoBehaviour
                 gameNavicable = true;
                 unitsSelectable = true;
                 uiNavicable = false;
-                Time.timeScale = 1f;
+                SetTimeScale("Play");
                 break;
             case (GameState.Paused):
                 UIController.uiController.SetUIPanel("Paused");
@@ -93,7 +92,7 @@ public class GameController : MonoBehaviour
                 gameNavicable = false;
                 unitsSelectable = false;
                 uiNavicable = true;
-                Time.timeScale = 0f;
+                SetTimeScale("Pause");
                 break;
             case (GameState.GameOver):
                 UIController.uiController.SetUIPanel("GameOver");
@@ -107,14 +106,11 @@ public class GameController : MonoBehaviour
                 Debug.Log("Game state does not exist, cannot update state");
                 break;
         }
-
         gameState = state;
     }
 
     public void StartGame()
     {
-        Time.timeScale = 0.1f;
-
         //Play camera rotation
         CameraController.cameraController.StartStopRotation(true);
         //Configure level
@@ -153,6 +149,55 @@ public class GameController : MonoBehaviour
 
         //Stop spawning power ups
         StopCoroutine(PowerUPSpawnSequencer);
+    }
+
+    int MovableUnitsUpdateAndCount()
+    {
+        int movableUnitsCount = 0;
+        foreach (GameObject unit in GetAllActiveUnitsOfTeam(CombatController.combatController.combat.playerTeamIndex))
+        {
+            if (unit.GetComponent<Unit>().combatState == Unit.UnitState.idle)
+            {
+                movableUnitsCount++;
+                unit.GetComponent<Unit>().UpdateSelectionRIng(true, CombatController.combatController.combat.selectionRingPrefab);
+            }
+            else
+            {
+                unit.GetComponent<Unit>().UpdateSelectionRIng(false, CombatController.combatController.combat.selectionRingPrefab);
+            }
+        }
+        movableUnits = movableUnitsCount;
+
+        if (Input.GetMouseButton(0) && gameState == GameState.Game)
+        {
+            return 0;
+        }
+        return movableUnitsCount;
+    }
+
+    bool SlowForPlayerMove()
+    {
+        if (MovableUnitsUpdateAndCount() > 0) return true;
+        else return false;
+    }
+
+    public void SetTimeScale(string state)
+    {
+        if(state == "Play")
+        {
+            if (SlowForPlayerMove())
+            {
+                Time.timeScale = CombatController.combatController.combat.playerMoveTimeSlow;
+            }
+            else
+            {
+                Time.timeScale = 1f;
+            }
+        }
+        else if(state == "Pause")
+        {
+            Time.timeScale = 0f;
+        }
     }
 
     public void ResetGame()
@@ -343,7 +388,7 @@ public class GameController : MonoBehaviour
         foreach(GameObject unit in GetAllActiveUnitsOfTeam(teamIndex))
         {
             unit.GetComponent<Unit>().attackCooldown.buffs = regenModifier;
-            unit.GetComponent<Unit>().poweredUpSpeed = modifier;
+           // unit.GetComponent<Unit>().poweredUpSpeed = modifier;
             unit.GetComponent<Unit>().AddEffect("Speed");
         }
 
@@ -361,7 +406,7 @@ public class GameController : MonoBehaviour
         foreach (GameObject unit in GetAllActiveUnitsOfTeam(teamIndex))
         {
             unit.GetComponent<Unit>().attackCooldown.buffs = 0f;
-            unit.GetComponent<Unit>().poweredUpSpeed = 1f;
+          //  unit.GetComponent<Unit>().poweredUpSpeed = 1f;
             unit.GetComponent<Unit>().RemoveEffect("Speed");
         }
         yield return null;
@@ -642,6 +687,7 @@ public class GameController : MonoBehaviour
             reward += unit.GetComponent<Unit>().reward;
         }
 
+        unit.GetComponent<Unit>().UpdateSelectionRIng(false, CombatController.combatController.combat.selectionRingPrefab);
 
         //Remove a dead unit and check if it was the last in its team
         activeUnits.Remove(unit);

@@ -1330,7 +1330,6 @@ GameObject:
   - component: {fileID: 117209011}
   - component: {fileID: 117209010}
   - component: {fileID: 117209009}
-  - component: {fileID: 117209013}
   m_Layer: 5
   m_Name: SpeedPowerUpButton
   m_TagString: Untagged
@@ -1347,7 +1346,7 @@ RectTransform:
   m_GameObject: {fileID: 117209007}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
   m_Children:
   - {fileID: 970930940}
   - {fileID: 1479488932}
@@ -1356,7 +1355,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 305, y: 57}
+  m_AnchoredPosition: {x: 392, y: 94}
   m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &117209009
@@ -1428,32 +1427,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 117209007}
   m_CullTransparentMesh: 0
---- !u!61 &117209013
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 117209007}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 250, y: 250}
-  m_EdgeRadius: 0
 --- !u!4 &118585561 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4391070287516400, guid: 1e29653bb4c131c4683a7294eab4358a,
@@ -7856,7 +7829,6 @@ GameObject:
   - component: {fileID: 748136104}
   - component: {fileID: 748136103}
   - component: {fileID: 748136106}
-  - component: {fileID: 748136107}
   m_Layer: 5
   m_Name: HealthPowerUpButton
   m_TagString: Untagged
@@ -7873,7 +7845,7 @@ RectTransform:
   m_GameObject: {fileID: 748136101}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
   m_Children:
   - {fileID: 318437389}
   - {fileID: 2516979}
@@ -7882,7 +7854,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 74, y: 84}
+  m_AnchoredPosition: {x: 92, y: 125}
   m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &748136103
@@ -7954,32 +7926,6 @@ MonoBehaviour:
   counter: {fileID: 2516980}
   powerUpType: 2
   usable: 0
---- !u!61 &748136107
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 748136101}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 250, y: 250}
-  m_EdgeRadius: 0
 --- !u!1001 &752862594
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14264,9 +14210,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arenaBounds: {fileID: 0}
   level: {fileID: 11400000, guid: 240eb5126685c3640ac3d44c33eea9f5, type: 2}
+  movableUnits: 0
+  reward: 0
   activeUnits: []
   slainEnemyIcons: []
-  reward: 0
   activeWorldPowerUps: []
   allyPowerUps: 
   enemyPowerUps: 
@@ -14277,6 +14224,7 @@ MonoBehaviour:
   speedUpEffect: {fileID: 108178, guid: e053c479a3add9649af9d847a748547d, type: 3}
   strengthUpEffect: {fileID: 117784, guid: db879c9dd49be994b9fcce9fea26448c, type: 3}
   staminaUpEffect: {fileID: 147226, guid: 4d496338295339f4ab150256f9d9f4b7, type: 3}
+  boostEffect: {fileID: 161470, guid: ef2fdb9a8a7d35c448dae6d056e9b1e7, type: 3}
   powerUpSpawnFrequency: 7
   powerUpDefaultDuration: 10
 --- !u!4 &1369653506
@@ -17474,7 +17422,7 @@ MonoBehaviour:
   bountyTitle: {fileID: 645651520}
   bountyStartPos: {fileID: 1600576282}
   spawnedBountyIcons: []
-  spacingBetweenBountyIcons: 75
+  spacingBetweenBountyIcons: 60
   timeBetweenBountyIcons: 0.1
   bountiesCentered: 1
   rewardSection: {fileID: 1312272180}
@@ -18714,7 +18662,6 @@ GameObject:
   - component: {fileID: 1813813123}
   - component: {fileID: 1813813122}
   - component: {fileID: 1813813121}
-  - component: {fileID: 1813813125}
   m_Layer: 5
   m_Name: StrengthPowerUpButton
   m_TagString: Untagged
@@ -18731,7 +18678,7 @@ RectTransform:
   m_GameObject: {fileID: 1813813119}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
   m_Children:
   - {fileID: 1855933309}
   - {fileID: 2112467522}
@@ -18740,7 +18687,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 303, y: 304}
+  m_AnchoredPosition: {x: 266, y: 299}
   m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1813813121
@@ -18812,32 +18759,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1813813119}
   m_CullTransparentMesh: 0
---- !u!61 &1813813125
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1813813119}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 250, y: 250}
-  m_EdgeRadius: 0
 --- !u!4 &1824999725 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4840115506764062, guid: 6d86765ceb21f3a499a97c64ed498a28,
@@ -21569,7 +21490,6 @@ GameObject:
   - component: {fileID: 2109761691}
   - component: {fileID: 2109761690}
   - component: {fileID: 2109761689}
-  - component: {fileID: 2109761693}
   m_Layer: 5
   m_Name: StaminaPowerUpButton
   m_TagString: Untagged
@@ -21586,7 +21506,7 @@ RectTransform:
   m_GameObject: {fileID: 2109761687}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
+  m_LocalScale: {x: 1.4, y: 1.4, z: 1.4}
   m_Children:
   - {fileID: 135405008}
   - {fileID: 803708972}
@@ -21595,7 +21515,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 58, y: 314}
+  m_AnchoredPosition: {x: 61, y: 423}
   m_SizeDelta: {x: 250, y: 250}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2109761689
@@ -21667,32 +21587,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2109761687}
   m_CullTransparentMesh: 0
---- !u!61 &2109761693
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2109761687}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 250, y: 250}
-  m_EdgeRadius: 0
 --- !u!1 &2111253161 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1016157527007364, guid: 6d86765ceb21f3a499a97c64ed498a28,

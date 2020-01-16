@@ -4,7 +4,7 @@
 QualitySettings:
   m_ObjectHideFlags: 0
   serializedVersion: 5
-  m_CurrentQuality: 2
+  m_CurrentQuality: 1
   m_QualitySettings:
   - serializedVersion: 2
     name: Low
@@ -42,7 +42,9 @@ QualitySettings:
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 11400000, guid: a31e9f9f9c9d4b9429ed0d1234e22103,
       type: 2}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Android
+    - Standalone
   - serializedVersion: 2
     name: Medium
     pixelLightCount: 1
@@ -79,7 +81,9 @@ QualitySettings:
     resolutionScalingFixedDPIFactor: 1
     customRenderPipeline: {fileID: 11400000, guid: d847b876476d3d6468f5dfcd34266f96,
       type: 2}
-    excludedTargetPlatforms: []
+    excludedTargetPlatforms:
+    - Standalone
+    - Android
   - serializedVersion: 2
     name: High
     pixelLightCount: 2
@@ -95,7 +99,7 @@ QualitySettings:
     skinWeights: 2
     textureQuality: 0
     anisotropicTextures: 1
-    antiAliasing: 2
+    antiAliasing: 0
     softParticles: 0
     softVegetation: 1
     realtimeReflectionProbes: 1
@@ -118,14 +122,5 @@ QualitySettings:
       type: 2}
     excludedTargetPlatforms: []
   m_PerPlatformDefaultQuality:
-    Android: 1
-    Lumin: 2
-    Nintendo Switch: 2
-    PS4: 2
-    Stadia: 2
+    Android: 2
     Standalone: 2
-    WebGL: 1
-    Windows Store Apps: 2
-    XboxOne: 2
-    iPhone: 1
-    tvOS: 1

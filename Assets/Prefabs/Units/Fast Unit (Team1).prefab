@@ -166,7 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   strat: 0
   timeRangeBetweenMoves: {x: 2.5, y: 3.5}
-  unitAimTime: 1
+  unitAimTimeMultiplier: 0.5
   attackPowerRange: {x: 0.7, y: 1}
   protectiveBubbleRadius: {x: 3, y: 4}
   escapeSpeedMultiplier: 10

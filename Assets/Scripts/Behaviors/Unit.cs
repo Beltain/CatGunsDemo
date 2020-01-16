@@ -37,6 +37,7 @@ public class Unit : MonoBehaviour
     protected Rigidbody rigidbody;
     [SerializeField] protected Transform[] aimReticule = { null, null };
     [SerializeField] protected Color[] aimReticuleStageGradient;
+    protected GameObject selectionRing;
 
     //End Game
     [SerializeField] public GameObject unitIconPrefab;
@@ -95,6 +96,7 @@ public class Unit : MonoBehaviour
                 //Allie Boost Code
                 UIController.uiController.PopupAlertUI(UIController.boostedMessage, unitHit.transform.position);
                 unitHit.nextAttackAllieBoosted += launchPower + currentAttackAllieBoosted;
+                unitHit.AddEffect("Boost");
                 currentAttackAllieBoosted = 0f;
             }
         }
@@ -175,8 +177,6 @@ public class Unit : MonoBehaviour
 
     IEnumerator LaunchSequence()
     {
-        if (teamIndex == 0) Time.timeScale = 1f;
-
         //Use Stamina
         UseStamina(attackDamageBase * launchPower);
         //Start Cooldown
@@ -186,6 +186,9 @@ public class Unit : MonoBehaviour
 
         //Set State
         combatState = UnitState.attacking;
+
+        //Reset time
+        if(teamIndex == CombatController.combatController.combat.playerTeamIndex) GameController.gameController.SetTimeScale("Play");
 
         //Spawn particles
         GameObject trailParticles;
@@ -352,12 +355,13 @@ public class Unit : MonoBehaviour
     {
         //keep unit stunned until it's cooldown has lapsed
         combatState = UnitState.stunned;
+        if (teamIndex == CombatController.combatController.combat.playerTeamIndex) GameController.gameController.SetTimeScale("Play");
         while (attackCooldown.currentValue != 0f)
         {
             yield return null;
         }
         combatState = UnitState.idle;
-        if (teamIndex == 0) Time.timeScale = 0.1f;
+        if (teamIndex == CombatController.combatController.combat.playerTeamIndex) GameController.gameController.SetTimeScale("Play");
         FaceCamera();
     }
 
@@ -401,6 +405,9 @@ public class Unit : MonoBehaviour
                 if (speedUpEffect != null) break;
                 speedUpEffect = Instantiate(GameController.gameController.speedUpEffect, transform);
                 break;
+            case ("Boost"):
+                Instantiate(GameController.gameController.boostEffect, transform);
+                break;
         }
     }
 
@@ -428,6 +435,17 @@ public class Unit : MonoBehaviour
 
     }
 
+    public void UpdateSelectionRIng(bool enabled, GameObject prefab)
+    {
+        if(selectionRing == null && enabled)
+        {
+            selectionRing = Instantiate(prefab, transform);
+        }
+        else if(selectionRing != null && !enabled)
+        {
+            Destroy(selectionRing);
+        }
+    }
 
     #endregion
 
