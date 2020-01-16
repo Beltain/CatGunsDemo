@@ -15,11 +15,15 @@ MonoBehaviour:
   arenaRadius: 20
   enemyQuantity: {x: 4, y: 5}
   allyQuantity: {x: 2, y: 2}
-  powerUpQuantity: {x: 2, y: 6}
+  powerUpQuantity: {x: 3, y: 4}
   alliesPool:
   - {fileID: 1376249910529751797, guid: a60fc3d54450b444cabbb711f94c419a, type: 3}
+  - {fileID: 258500786208340034, guid: 41ff399a338cb6646afb429b72967dd1, type: 3}
   enemiesPool:
   - {fileID: 3751758593795256132, guid: 8183489df993ab74bb716ce8a2328b73, type: 3}
+  - {fileID: 2104950398800337511, guid: 32a3ef6e0633cf94da0fc3a6b09f80d2, type: 3}
+  - {fileID: 616408347732019005, guid: 6cd03f017adbd9348b4c53901fb6aaeb, type: 3}
+  - {fileID: 3859647056764001813, guid: 2f6d7ce457e9eb64ead11f58d325bc94, type: 3}
   powerUpsPool:
   - {fileID: 7461471981589343595, guid: e8cc157a96f71a3428529df2ed2e8f8f, type: 3}
   - {fileID: 7069658175201313451, guid: b5f6bfc71ae6283419fa198b721fbe90, type: 3}

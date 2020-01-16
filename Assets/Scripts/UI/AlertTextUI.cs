@@ -2,24 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class AlertTextUI : MonoBehaviour
 {
-    [SerializeField] protected Text alertText;
+    [SerializeField] protected TextMeshProUGUI alertText;
     [SerializeField] protected float travelUpSpeed;
     [SerializeField] protected float duration;
     [SerializeField] protected Color[] startStopLerpColors;
 
     private void Awake()
     {
-        alertText = GetComponent<Text>();
+        alertText = GetComponent<TextMeshProUGUI>();
     }
 
 
     public void DisplayAlert(string value)
     {
-        alertText.text = value;
-        StartCoroutine(PlayDamageSequence());
+        alertText.SetText(value);
+        if(alertText.gameObject.activeInHierarchy)StartCoroutine(PlayDamageSequence());
     }
 
     IEnumerator PlayDamageSequence()
@@ -38,8 +39,13 @@ public class AlertTextUI : MonoBehaviour
     public void StopCoroutine()
     {
         StopAllCoroutines();
-        alertText.text = "";
+        alertText.SetText("");
         gameObject.SetActive(false);
+    }
+
+    private void OnDisable()
+    {
+        StopCoroutine();
     }
 
 

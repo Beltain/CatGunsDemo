@@ -11,6 +11,7 @@ public class BasicEnemyAI : MonoBehaviour
     Unit unit;
 
     [SerializeField] protected Vector2 timeRangeBetweenMoves = new Vector2(2f, 5f);
+    [SerializeField] protected float unitAimTime = 1f;
     [SerializeField] protected Vector2 attackPowerRange = new Vector2(0.5f, 1f);
     [SerializeField] protected Vector2 protectiveBubbleRadius = new Vector2(4f, 6f);
     [SerializeField] protected float escapeSpeedMultiplier = 2f;
@@ -172,9 +173,15 @@ public class BasicEnemyAI : MonoBehaviour
         {
             //DO THIS BEFORE LAUNCHING
             //Debug.Log("Launching in " + drawTime + " seconds");
-            drawPercentage = (startDrawTime - (drawTime / startDrawTime));
+            drawPercentage = (1f - (drawTime / startDrawTime));
             unit.AimToward(target, drawPercentage);
             drawTime -= Time.deltaTime;
+            yield return null;
+        }
+        float aimTime = unitAimTime;
+        while(aimTime > 0f)
+        {
+            aimTime -= Time.deltaTime * CombatController.combatController.combat.gameSpeedMultiplier;
             yield return null;
         }
         //Launch

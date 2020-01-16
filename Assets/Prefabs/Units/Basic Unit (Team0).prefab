@@ -60,7 +60,7 @@ Rigidbody:
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 116
   m_CollisionDetection: 1
 --- !u!114 &1376249910529751785
@@ -97,10 +97,10 @@ MonoBehaviour:
     regenRate: 2
     buffs: 0
   stamina:
-    maxValue: 100
+    maxValue: 60
     minValue: 0
-    currentValue: 100
-    smoothedValue: 100
+    currentValue: 60
+    smoothedValue: 60
     regenRate: 4
     buffs: 0
   combatState: 0
@@ -113,6 +113,10 @@ MonoBehaviour:
   - {r: 1, g: 0.7169812, b: 0.7169812, a: 1}
   - {r: 0.8396226, g: 0.3722855, b: 0.3722855, a: 1}
   - {r: 0.4811321, g: 0.11801352, b: 0.11801352, a: 1}
+  unitIconPrefab: {fileID: 598603903101190624, guid: 7b772b19a61c12b4eaadb7dfc1ba6288,
+    type: 3}
+  poweredUpSpeed: 1
+  poweredUpStrength: 1
 --- !u!1 &2356699681407530699
 GameObject:
   m_ObjectHideFlags: 0
@@ -340,6 +344,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1376249910529751798}
     m_Modifications:
+    - target: {fileID: 1540174814971806, guid: 1122838a0b1f72a4b8b4a58c7f9c59dd, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1642452146625340, guid: 1122838a0b1f72a4b8b4a58c7f9c59dd, type: 3}
       propertyPath: m_Name
       value: Hero_01_Knight

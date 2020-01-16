@@ -8,6 +8,7 @@ public class CameraController : MonoBehaviour
 
     IEnumerator TouchChecker;
     IEnumerator TouchDeltasCalculator;
+    IEnumerator CamRotator;
 
     Vector2 dragVector;
     float touchDelta = 0f;
@@ -26,26 +27,24 @@ public class CameraController : MonoBehaviour
 
     protected Camera cam;
     [SerializeField] public Vector2 zoomLimits = new Vector2(15f, 25f);
+    [SerializeField] protected float startStopRotationDuration = 1f;
+    [SerializeField] public Quaternion startRotation;
+    [SerializeField] public Quaternion stopRotation;
     [SerializeField] public float startZoom = 20f;
     [SerializeField] protected float zoomSpeed = 1f;
     [SerializeField] protected float scrollSpeed = 1f;
 
-    private void Start()
+    private void Awake()
     {
         cam = Camera.main;
         cam.orthographicSize = Mathf.Clamp(startZoom, zoomLimits.x, zoomLimits.y);
+        transform.rotation = startRotation;
         cameraController = this;
     }
 
     private void Update()
     {
-       /* if (GameController.gameNavicable) GetTouchInput();
-        else if(TouchChecker != null)
-        { */
-            //reset input check
-           // StopCoroutine(TouchChecker);
-          //  TouchChecker = null;
-       // }
+
     }
 
     private void GetTouchInput()
@@ -160,4 +159,39 @@ public class CameraController : MonoBehaviour
         TouchDeltasCalculator = null;
     }
     
+    public void StartStopRotation(bool state)
+    {
+        if (CamRotator != null) StopCoroutine(CamRotator);
+        CamRotator = StartStopRotationSequence(state);
+        StartCoroutine(CamRotator);
+    }
+
+    IEnumerator StartStopRotationSequence(bool state)
+    {
+        //Lerp the X rotation over defined duration
+
+        Quaternion startRot;
+        Quaternion stopRot;
+        if (state)
+        {
+            stopRot = stopRotation;
+        }
+        else
+        {
+            stopRot = startRotation;
+        }
+        startRot = transform.rotation;
+        float progress = 0.0f;
+
+        while(progress != 1f)
+        {
+            progress += Time.unscaledDeltaTime * startStopRotationDuration;
+            progress = Mathf.Clamp(progress, 0f, 1f);
+            transform.rotation = Quaternion.Lerp(startRot, stopRot, progress);//+= Time.deltaTime / startStopRotationDuration;
+            yield return null;
+        }
+
+        yield return null;
+    }
+
 }

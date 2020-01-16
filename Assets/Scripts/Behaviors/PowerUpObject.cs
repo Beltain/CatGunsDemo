@@ -5,7 +5,7 @@ using UnityEngine;
 [RequireComponent(typeof(SphereCollider))]
 public class PowerUpObject : MonoBehaviour
 {
-    public GameObject powerUp;
+    public GameController.PowerUp powerUpType;
     Vector3 startPos;
 
     private void Start()
@@ -17,7 +17,7 @@ public class PowerUpObject : MonoBehaviour
     {
         if (other.gameObject.GetComponent<Unit>() != null)
         {
-            GameController.gameController.AddPowerUpToTeam(other.gameObject.GetComponent<Unit>().teamIndex, powerUp);
+            GameController.gameController.AddPowerUpToTeam(other.gameObject.GetComponent<Unit>().teamIndex, powerUpType);
             GameController.gameController.RemoveWorldPowerUp(gameObject);
             Destroy(gameObject);
         }

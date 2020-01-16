@@ -86,5 +86,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ec5b0170ccb47143a7327923017253a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  staminaRegenMultiplier: 1.2
-  staminaRefillAmount: 0.5
+  staminaRegenMultiplier: 1.1
+  staminaRefillAmount: 0.3

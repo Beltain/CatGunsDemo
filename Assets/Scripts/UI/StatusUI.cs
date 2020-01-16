@@ -53,7 +53,7 @@ public class StatusUI : MonoBehaviour
             //Update ready indicator
             if (!unitIsReady && unit.teamIndex == 0)
             {
-                if(unit.combatState == Unit.UnitState.idle)
+                if(unit.combatState == Unit.UnitState.idle && unit.attackCooldown.currentValue == 0)
                 {
                     readyIndicator.SetActive(true);
                     unitIsReady = true;

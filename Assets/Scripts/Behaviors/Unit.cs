@@ -38,6 +38,20 @@ public class Unit : MonoBehaviour
     [SerializeField] protected Transform[] aimReticule = { null, null };
     [SerializeField] protected Color[] aimReticuleStageGradient;
 
+    //End Game
+    [SerializeField] public GameObject unitIconPrefab;
+    [SerializeField] public float reward;
+
+    //Power Up Modifiers
+    public float poweredUpSpeed = 1f;
+    public float poweredUpStrength = 1f;
+    //Power Up Effects
+    private GameObject healthUpEffect;
+    private GameObject staminaUpEffect;
+    private GameObject speedUpEffect;
+    private GameObject strengthUpEffect;
+
+
     private void Start()
     {
         UnitSetup();
@@ -74,8 +88,6 @@ public class Unit : MonoBehaviour
             {
                 //Combat Code
                 CalculateCombatOutcome(unitHit);
-
-                Debug.Log(collision.gameObject.name);
             }
 
             else if(unitHit.teamIndex == teamIndex && combatState == UnitState.attacking)
@@ -139,7 +151,7 @@ public class Unit : MonoBehaviour
 
     private void DealAttack(Unit enemyUnit)
     {
-        enemyUnit.TakeDamage(attackDamageBase * (launchPower + currentAttackAllieBoosted) );
+        enemyUnit.TakeDamage(attackDamageBase * poweredUpStrength * (launchPower + currentAttackAllieBoosted) );
         //Debug.Log(enemyUnit.gameObject.name + " took damage");
         currentAttackAllieBoosted = 0f;
     }
@@ -163,6 +175,8 @@ public class Unit : MonoBehaviour
 
     IEnumerator LaunchSequence()
     {
+        if (teamIndex == 0) Time.timeScale = 1f;
+
         //Use Stamina
         UseStamina(attackDamageBase * launchPower);
         //Start Cooldown
@@ -173,12 +187,18 @@ public class Unit : MonoBehaviour
         //Set State
         combatState = UnitState.attacking;
 
+        //Spawn particles
+        GameObject trailParticles;
+        if (teamIndex == 0) trailParticles = GameController.gameController.allyTrail;
+        else trailParticles = GameController.gameController.enemyTrail;
+        trailParticles = Instantiate(trailParticles, transform);
+
         //Add initial velocity and make sure the unit can travel further than their max stamina allows if boosted by an allie
         float launchVelocityMultiplier = Mathf.Clamp(launchPower + currentAttackAllieBoosted, 0f, 1f);
-        rigidbody.velocity += transform.forward * launchSpeed * launchVelocityMultiplier;
+        rigidbody.velocity += transform.forward * launchSpeed * poweredUpSpeed * launchVelocityMultiplier;
 
         //Dampen over time (using drag in RB)
-        while (rigidbody.velocity.magnitude > 0.2f)
+        while (rigidbody.velocity.magnitude > 0.3f)
         {
             yield return null;
         }
@@ -186,6 +206,9 @@ public class Unit : MonoBehaviour
         rigidbody.velocity = Vector3.zero;
         launchPower = 0f;
         currentAttackAllieBoosted = 0f;
+
+        //Remove particles
+        Destroy(trailParticles);
 
         //Set inactive during cooldown and face the unit forward
         StartCoroutine(CoolDownSequence());
@@ -232,6 +255,7 @@ public class Unit : MonoBehaviour
             Renderer[] rendersToChange = aimRet.gameObject.GetComponentsInChildren<Renderer>();
             foreach (Renderer rend in rendersToChange)
             {
+                rend.material.SetColor("_EmissionColor", sizeChosenColor);
                 rend.material.SetColor("_BaseColor", sizeChosenColor);
             }
         }
@@ -290,7 +314,15 @@ public class Unit : MonoBehaviour
         {
             justReceivedDamage = true;
             health.currentValue = Mathf.Clamp(health.currentValue - damage, health.minValue, health.maxValue);
-            UIController.uiController.PopupAlertUI(Mathf.RoundToInt(damage).ToString(), transform.position);
+
+            if(damage >= 0)
+            {
+                //Disrupt the cooldown
+                attackCooldown.currentValue = Mathf.Clamp(attackCooldown.currentValue + CombatController.combatController.combat.attackDisruptionInSeconds, attackCooldown.minValue, attackCooldownBase);
+                StartCoroutine(CoolDownSequence());
+                UIController.uiController.PopupAlertUI(Mathf.RoundToInt(damage).ToString(), transform.position);
+            }
+
             if (health.currentValue == 0f) Die();
             Invoke("JustReceivedDamage", 0.1f);
         }
@@ -325,6 +357,7 @@ public class Unit : MonoBehaviour
             yield return null;
         }
         combatState = UnitState.idle;
+        if (teamIndex == 0) Time.timeScale = 0.1f;
         FaceCamera();
     }
 
@@ -338,12 +371,65 @@ public class Unit : MonoBehaviour
     IEnumerator DeathSequence()
     {
         //Add all death processes here
-
+        Instantiate(GameController.gameController.unitDeathEffect, transform.position, Quaternion.identity);
         Destroy(gameObject);
 
         yield return null;
     }
 
     #endregion
+
+    #region Visual Effects
+
+    public void AddEffect(string type)
+    {
+        switch (type)
+        {
+            case ("Health"):
+                if (healthUpEffect != null) break;
+                healthUpEffect = Instantiate(GameController.gameController.healthUpEffect, transform);
+                break;
+            case ("Stamina"):
+                if (staminaUpEffect != null) break;
+                staminaUpEffect = Instantiate(GameController.gameController.staminaUpEffect, transform);
+                break;
+            case ("Strength"):
+                if (strengthUpEffect != null) break;
+                strengthUpEffect = Instantiate(GameController.gameController.strengthUpEffect, transform);
+                break;
+            case ("Speed"):
+                if (speedUpEffect != null) break;
+                speedUpEffect = Instantiate(GameController.gameController.speedUpEffect, transform);
+                break;
+        }
+    }
+
+    public void RemoveEffect(string type)
+    {
+        switch (type)
+        {
+            case ("Health"):
+                if (healthUpEffect == null) break;
+                Destroy(healthUpEffect);
+                break;
+            case ("Stamina"):
+                if (staminaUpEffect == null) break;
+                Destroy(staminaUpEffect);
+                break;
+            case ("Strength"):
+                if (strengthUpEffect == null) break;
+                Destroy(strengthUpEffect);
+                break;
+            case ("Speed"):
+                if (speedUpEffect == null) break;
+                Destroy(speedUpEffect);
+                break;
+        }
+
+    }
+
+
+    #endregion
+
 
 }
