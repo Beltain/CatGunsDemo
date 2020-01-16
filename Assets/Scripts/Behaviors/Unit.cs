@@ -17,6 +17,7 @@ public class Unit : MonoBehaviour
     protected float launchPower = 1f; //Range: 0 - 1
     public float nextAttackAllieBoosted = 0f; //Can increase indefinitely
     protected float currentAttackAllieBoosted = 0f;
+    protected bool hasBoosted = false;
     bool justReceivedDamage = false;
 
     //Vitality
@@ -91,13 +92,14 @@ public class Unit : MonoBehaviour
                 CalculateCombatOutcome(unitHit);
             }
 
-            else if(unitHit.teamIndex == teamIndex && combatState == UnitState.attacking)
+            else if(unitHit.teamIndex == teamIndex && combatState == UnitState.attacking && !hasBoosted)
             {
                 //Allie Boost Code
                 UIController.uiController.PopupAlertUI(UIController.boostedMessage, unitHit.transform.position);
                 unitHit.nextAttackAllieBoosted += launchPower + currentAttackAllieBoosted;
                 unitHit.AddEffect("Boost");
                 currentAttackAllieBoosted = 0f;
+                hasBoosted = true;
             }
         }
     }
@@ -177,6 +179,8 @@ public class Unit : MonoBehaviour
 
     IEnumerator LaunchSequence()
     {
+        //Reset boosted
+        hasBoosted = false;
         //Use Stamina
         UseStamina(attackDamageBase * launchPower);
         //Start Cooldown

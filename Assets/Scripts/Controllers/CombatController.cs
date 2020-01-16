@@ -39,11 +39,11 @@ public class CombatController : MonoBehaviour
             else
             {
                 //Set the time scale to normal
-                Time.timeScale = 1f;
+                GameController.gameController.SetTimeScale("PlayRegardless");
             }
         }
 
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && GameController.gameController.gameState == GameController.GameState.Game)
         {
             GameController.gameController.SetTimeScale("Play");
         }

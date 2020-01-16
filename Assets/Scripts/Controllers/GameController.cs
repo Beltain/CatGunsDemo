@@ -32,8 +32,8 @@ public class GameController : MonoBehaviour
     [SerializeField] public GameObject strengthUpEffect;
     [SerializeField] public GameObject staminaUpEffect;
     [SerializeField] public GameObject boostEffect;
-    enum GameState { MainMenu, Game, Paused, GameOver}
-    GameState gameState = GameState.MainMenu;
+    public enum GameState { MainMenu, Game, Paused, GameOver}
+    public GameState gameState = GameState.MainMenu;
 
     [Space(10)][Header("Powerups")]
     IEnumerator PowerUPSpawnSequencer;
@@ -100,7 +100,7 @@ public class GameController : MonoBehaviour
                 gameNavicable = false;
                 unitsSelectable = false;
                 uiNavicable = true;
-                Time.timeScale = 1f;
+                SetTimeScale("PlayRegardless");
                 break;
             default:
                 Debug.Log("Game state does not exist, cannot update state");
@@ -121,6 +121,8 @@ public class GameController : MonoBehaviour
         //Start power up spawning
         PowerUPSpawnSequencer = PowerUpSpawnSequence();
         StartCoroutine(PowerUPSpawnSequencer);
+        //Play music
+        AudioController.audioController.PlaySound(AudioController.audioController.bgMusic, true, 0);
     }
 
     public void StopGame()
@@ -149,6 +151,9 @@ public class GameController : MonoBehaviour
 
         //Stop spawning power ups
         StopCoroutine(PowerUPSpawnSequencer);
+
+        //Stop music
+        AudioController.audioController.StopMusic();
     }
 
     int MovableUnitsUpdateAndCount()
@@ -172,7 +177,7 @@ public class GameController : MonoBehaviour
         {
             return 0;
         }
-        return movableUnitsCount;
+        else return movableUnitsCount;
     }
 
     bool SlowForPlayerMove()
@@ -185,18 +190,26 @@ public class GameController : MonoBehaviour
     {
         if(state == "Play")
         {
-            if (SlowForPlayerMove())
+            if (SlowForPlayerMove() && gameState == GameState.Game)
             {
                 Time.timeScale = CombatController.combatController.combat.playerMoveTimeSlow;
+                AudioController.audioController.ChangeTempo(AudioController.slowedTempo, true);
             }
             else
             {
                 Time.timeScale = 1f;
+                AudioController.audioController.ChangeTempo(1f, true);
             }
         }
         else if(state == "Pause")
         {
             Time.timeScale = 0f;
+            AudioController.audioController.ChangeTempo(1f, true);
+        }
+        else if(state == "PlayRegardless")
+        {
+            Time.timeScale = 1f;
+            AudioController.audioController.ChangeTempo(1f, true);
         }
     }
 
@@ -687,6 +700,9 @@ public class GameController : MonoBehaviour
             reward += unit.GetComponent<Unit>().reward;
         }
 
+        //Play Sound
+        AudioController.audioController.PlaySound(AudioController.audioController.explosion, false, 0);
+
         unit.GetComponent<Unit>().UpdateSelectionRIng(false, CombatController.combatController.combat.selectionRingPrefab);
 
         //Remove a dead unit and check if it was the last in its team
@@ -750,6 +766,9 @@ public class GameController : MonoBehaviour
                 Debug.Log("That team index has not been coded in yet?!?");
                 break;
         }
+
+        //Set speed back to one
+        SetTimeScale("PlayRegardless");
     }
 
     #endregion
